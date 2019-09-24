@@ -1,0 +1,17 @@
+{
+    "name": "laura/projektas_2019",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laura Januskeviciene",
+            "email": "laura.januske@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "PROJ\\": "src/"  }
+    },
+    "require": {
+        "monolog/monolog": "1.0.*"
+    }
+}
