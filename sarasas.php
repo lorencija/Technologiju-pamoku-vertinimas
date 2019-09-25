@@ -5,19 +5,14 @@
     <title> TPVS </title>
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-<!--    <link rel="shortcut icon" href="images/favicon.ico">-->
 </head>
 <body>
 <div class="container">
-    <div class="klases">
-        <h1>Klasių sąrašas</h1>
-        <div id="appending"></div>
-    </div>
-    <div class="control">
-        <button id="prideti">Pridėti</button>
-        <button id="saugoti">Saugoti</button>
-        <button id="trinti">Trinti</button>
-    </div>
+
+        <button id="prideti">MOKINIŲ SĄRAŠAS</button>
+        <button id="saugoti">PAMOKOS</button>
+
+
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="js/kodas.js"></script>

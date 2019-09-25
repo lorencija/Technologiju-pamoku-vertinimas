@@ -1,17 +1,28 @@
-// $(document).ready(function(){
-//
-// });
+let c_name, c_text, jsonData, id_by_class;
 
-let c_name, c_text, jsonData;
+$(document).ready(function () {
+    $.get('index.php?action=skaityti', function (data) {
+       let as = JSON.parse(data);
+       let i;
+     for (i=0;i<as.length;i++){
+         let masyvas=as[i];
+         $('#appending').append('<p><input type="checkbox" name="'+masyvas['ID']+'" value="'+masyvas['klases_aprasymas']+'">' +
+             '<a href="index.php?action=skaityti&name=' + masyvas['klase'] + '" id="' + masyvas['klases_aprasymas'] +
+             '">' + masyvas['klase'] + '</a></p>' );
+     }
 
-$('#prideti').click(function(){
-    $('#appending').append('<p><input type="checkbox" name="checkclass" value="unnamed"> ' +
+    });
+});
+
+
+$('#prideti').click(function () {
+    $('#appending').append('<p><input type="checkbox" name="checkclass" value="unnamed">' +
         '<input type="text" name="newclass" id="addnewclass" size="38em"></p>');
 });
 
 function setData() {
     c_name = $('#addnewclass').val();
-    c_text=nameFromEntering(c_name);
+    c_text = nameFromEntering(c_name);
 }
 
 function createJson() {
@@ -20,41 +31,37 @@ function createJson() {
         classtext: c_text
     };
 }
+
 function nameFromEntering(class_name) {
     return class_name.replace(' ', '');
 }
 
 function setJson() {
-    $.post('entering.php', jsonData, function (data) {
+    $.post('index.php?action=entering', jsonData, function () {
+        // $('p:last-child').html('<input type="checkbox" name="checkclass" value="'+c_text+'">' +
+        //     '<span id="' + c_text +
+        //     '" class="rastiklasesID">' + c_name + '</span>');
 
-       // $('p:last-child').html(data);
-        $('p:last-child').html('<a href="entering.php" id="'+c_text+'">'+c_name+'</a>');
-            })
+        $('p:last-child').html('<input type="checkbox" name="checkclass" value="u' + c_text + '">'+
+            '<a href="index.php?action=skaityti&name=' + c_name + '" id="' + c_text + '">' + c_name + '</a>');
+    })
 
 }
 
-
-// function setJsonData() {
-//     $.ajax({
-//         url: 'entering.php',
-//         dataType: 'json',
-//         type: 'POST',
-//         data: jsonData,
-//         success: function (data) {
-//                          alert('duomenys gauti  '+data.classname);
-//            }
-//         // failure:function (data) {
-//         //     if (!data.success){
-//         //         alert('negerai');
-//         //     }
-//         // }
-//     });
-// }
-
-$('#saugoti').click(function(){
+$('#saugoti').click(function () {
     setData();
     createJson();
     setJson();
-    // $('p:last-child').html('<a href="types.php" id="'+c_text+'">'+c_name+'</a>');
 });
+
+
+$(document).ready(function () {
+    $('p').click(function(){
+       // alert($(this).index());
+    });
+});
+
+
+
+
 

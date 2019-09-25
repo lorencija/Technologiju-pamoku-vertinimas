@@ -12,6 +12,7 @@
         "psr-4": { "PROJ\\": "src/"  }
     },
     "require": {
-        "monolog/monolog": "1.0.*"
-    }
+        "monolog/monolog": "1.0.*",
+        "ext-json": "*"
+     }
 }

@@ -29,6 +29,14 @@ class Db
         $stmt->execute();
     }
 
+    public function showAllKlases(): array
+    {        $stmt = $this->connect->prepare('SELECT * FROM klases');
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, Klase::class);
+        $rezultatai = $stmt->fetchAll();
+        return $rezultatai;
+    }
+
     public function close(): void
     {
         $this->connect = null;
