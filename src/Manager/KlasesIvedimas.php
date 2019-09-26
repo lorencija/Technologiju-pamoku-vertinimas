@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PROJ\Ivedimas;
+namespace PROJ\Manager;
 
 class KlasesIvedimas
 {

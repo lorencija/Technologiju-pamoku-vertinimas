@@ -3,9 +3,10 @@
 namespace PROJ\Entity;
 
 class Klase
-{     private $id;
-    private $name;
-    private $description;
+{
+    private $id;
+    private $klase;
+    private $klases_aprasymas;
 
     /**
      * @return mixed
@@ -28,36 +29,36 @@ class Klase
     /**
      * @return mixed
      */
-    public function getName()
+    public function getKlase()
     {
-        return $this->name;
+        return $this->klase;
     }
 
     /**
-     * @param mixed $name
+     * @param mixed $klase
      * @return Klase
      */
-    public function setName($name)
+    public function setKlase($klase)
     {
-        $this->name = $name;
+        $this->klase = $klase;
         return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getDescription()
+    public function getKlasesaprasymas()
     {
-        return $this->description;
+        return $this->klases_aprasymas;
     }
 
     /**
-     * @param mixed $description
+     * @param mixed $klases_aprasymas
      * @return Klase
      */
-    public function setDescription($description)
+    public function setKlasesaprasymas($klases_aprasymas)
     {
-        $this->description = $description;
+        $this->klases_aprasymas = $klases_aprasymas;
         return $this;
     }
 
