@@ -3,9 +3,29 @@
 namespace PROJ\Entity;
 
 class Mokinys
-{ private $id;
-private $mokinys;
+{
+    private $id;
+    private $mokinys;
     private $mokinio_aprasymas;
+    private $klases_id;
+
+    /**
+     * @return mixed
+     */
+    public function getKlasesId()
+    {
+        return $this->klases_id;
+    }
+
+    /**
+     * @param mixed $klases_id
+     * @return Mokinys
+     */
+    public function setKlasesId($klases_id)
+    {
+        $this->klases_id = $klases_id;
+        return $this;
+    }
 
     /**
      * @return mixed

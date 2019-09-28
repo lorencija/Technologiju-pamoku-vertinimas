@@ -1,42 +1,53 @@
 <?php declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
-// REFRESINIMAS
-//PRIDEJIMAS NE PO VIENA
 
-//suprastinti TemplateEngine
-
-//klases ir mokinio ivedimas sujungti
-/// atidaro naujam lange
-
-//sukurti nauja duombaze
-//mokinio ivedimas neveikia
-
-
-use PROJ\Manager\Skaityti;
 use PROJ\DB\Db;
 use PROJ\Entity\Klase;
-use PROJ\Manager\KlasesIvedimas;
-use PROJ\Manager\MokinioIvedimas;
-use PROJ\DTO\KlaseDTO;
-use PROJ\Service\TemplateEngineService;
 use PROJ\Entity\Mokinys;
+use PROJ\Manager\Ivedimas;
+use PROJ\DTO\KlaseDTO;
+use PROJ\DTO\MokinioDTO;
+use PROJ\Service\TemplateEngineService;
 
 $action = $_REQUEST['action'];
 if ($action) {
+
     if ($action == 'entering') {
-        $ivedimas = new KlasesIvedimas();
+        $ivedimas = new Ivedimas();
         $klas = new Klase();
-        $A = $ivedimas->ivestiKlase();
+        $zinute = $ivedimas->tikrintiIvedima();
+        if ($zinute === 'OK') {
+            $A = $ivedimas->ivestiObjekta();
+            $klas->setKlase($A['cname']);
+            $klas->setKlasesaprasymas($A['ctext']);
+            $duomenuBaze = new Db();
+            $lastID = $duomenuBaze->saveToKlase($klas);
+            $duomenuBaze->close();
+            echo '{"id":"' . $lastID . '","zinute":"' . $zinute . '"}';
+        } else {
+            echo '{"id":"0","zinute":"' . $zinute . '"}';
+        }
 
-        $klas->setKlase($A['cname']);
-        $klas->setKlasesaprasymas($A['ctext']);
+    } elseif ($action == 'enteringmokiniai') {
+        $name = $_GET['name'];
+        $ivedimas = new Ivedimas();
+        $mok = new Mokinys();
+        $zinute = $ivedimas->tikrintiIvedima();
+        if ($zinute === 'OK') {
+            $A = $ivedimas->ivestiObjekta();
+            $mok->setMokinys($A['cname']);
+            $mok->setMokinioAprasymas($A['ctext']);
+            $mok->setKlasesId($name);
+            $duomenuBaze = new Db();
+            $lastID = $duomenuBaze->saveToMokinys($mok);
+            $duomenuBaze->close();
+            echo '{"id":"' . $lastID . '","zinute":"' . $zinute . '"}';
+        } else {
+            echo '{"id":"0","zinute":"' . $zinute . '"}';
+        }
 
-        $duomenuBaze = new Db();
-        $duomenuBaze->saveToKlase($klas);
-        $duomenuBaze->close();
     } elseif ($action == 'visosklases') {
-        //$obj=(new Skaityti())->skaitytiKlase($_GET['name']);
         $duomenuBaze = new Db();
         $klasiuMasyvas = $duomenuBaze->findAllKlases();
         $duomenuBaze->close();
@@ -50,61 +61,76 @@ if ($action) {
             $naujosKlases[] = $naujaKlase;
         }
         echo json_encode($naujosKlases);
+
+    } elseif ($action == 'visimokiniai') {
+        $name = $_GET['name'];
+        $duomenuBaze = new Db();
+        $mokiniuMasyvas = $duomenuBaze->findAllMokiniai($name);
+        $duomenuBaze->close();
+        $naujiMokiniai = [];
+        /** @var Mokinys $mokinys */
+        foreach ($mokiniuMasyvas as $mokinys) {
+            $naujasMokinys = new MokinioDTO();
+            $naujasMokinys->id = $mokinys->getId();
+            $naujasMokinys->mokinys = $mokinys->getMokinys();
+            $naujasMokinys->mokinio_aprasymas = $mokinys->getMokinioAprasymas();
+            $naujasMokinys->klases_id = $mokinys->getKlasesId();
+            $naujiMokiniai[] = $naujasMokinys;
+        }
+        echo json_encode($naujiMokiniai);
+
+    }elseif ($action == 'mokiniopasirinkimas') {
+        $name = $_GET['name'];
+        $templateEngineService = new TemplateEngineService(__DIR__ . '\mokinys.html');
+        $templateEngineService->setParameters(['klases_id' => $name]);
+        $templateEngineService->render();
+//        $name = $_GET['name'];
+//        $duomenuBaze = new Db();
+//        $pasirinktasmokinys = $duomenuBaze->findMokiniById($name);
+//        $duomenuBaze->close();
+//        echo '{"mokiniovardas":"' . $pasirinktasmokinys . '"}';
+
     } elseif ($action == 'mp_sarasas') {
         $name = $_GET['name'];
         $templateEngineService = new TemplateEngineService(__DIR__ . '\mokiniai_pamokos.html');
         $templateEngineService->setParameters(['klases_id' => $name]);
         $templateEngineService->render();
+
     } elseif ($action == 'mokiniu_sarasas') {
         $name = $_GET['name'];
 //        $kl=$db->findKlase($name);
 //        $templateEngineService->setParameters(['klases_id' => $kl->getID()]);
-
-
         $templateEngineService = new TemplateEngineService(__DIR__ . '\mokiniu_sarasas.html');
         $templateEngineService->setParameters(['klases_id' => $name]);
         $templateEngineService->render();
-    } elseif ($action == 'trintiklases') {
 
+    } elseif ($action == 'trintiklases') {
         try {
             $allID = json_decode(file_get_contents('php://input'));
             if (empty($allID)) {
-                throw new \Exception('Nenurodyta klase');
+                throw new \Exception('Nenurodyta klasė');
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteKlases($allID);
             $duomenuBaze->close();
-            header('Location: index.html');
         } catch (\Exception $e) {
-            echo 'Klaida trinant klase';
+            echo 'Klaida trinant klasę';
         }
-    } elseif ($action == 'trintiklase') {
 
+    } elseif ($action == 'trintiklase') {
         try {
             $name = $_GET['name'];
-            if (empty($name )) {
-                throw new \Exception('Nenurodyta klase');
+            if (empty($name)) {
+                throw new \Exception('Nenurodyta klasė');
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteKlaseById((int)$name);
             $duomenuBaze->close();
             header('Location: index.html');
         } catch (\Exception $e) {
-            echo 'Klaida trinant klase';
+            echo 'Klaida trinant klasę';
         }
-    }elseif ($action == 'enteringmokiniai') {
-        $name = $_GET['name'];
-        var_dump($name);
-        $ivedimas = new MokinioIvedimas();
-        $klas = new Mokinys();
-        $A = $ivedimas->ivestiMokini();
 
-        $klas->setMokinys($A['cname']);
-        $klas->setMokinioAprasymas($A['ctext']);
-        $duomenuBaze = new Db();
-       $duomenuBaze->createTableMokinys($name);
-       $duomenuBaze->saveToMokinys($klas, $name);
-       $duomenuBaze->close();
     } else {
         echo 'klaida action';
     }

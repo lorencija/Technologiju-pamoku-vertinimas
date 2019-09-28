@@ -20,7 +20,7 @@ class Db
         }
     }
 
-    function saveToKlase(Klase $klase): void
+    function saveToKlase(Klase $klase): string
     {
         $klasesvardas = $klase->getKlase();
         $klasesaprasas = $klase->getKlasesaprasymas();
@@ -28,33 +28,48 @@ class Db
         $stmt->bindValue(':kvardas', $klasesvardas);
         $stmt->bindValue(':kaprasas', $klasesaprasas);
         $stmt->execute();
+        return $this->connect->lastInsertId();
     }
 
-    function createTableMokinys(string $pavadinimas): void
-    {
-        $stmt = $this->connect->prepare('CREATE TABLE '.$pavadinimas.' ( id int NOT NULL AUTO_INCREMENT, vardaspavarde varchar(50), vardaspavarde_aprasymas varchar(50), PRIMARY KEY (id));');
-        $stmt->execute();
-    }
-
-    function saveToMokinys(Mokinys $mokinys, string $pavadinimas): void
+    function saveToMokinys(Mokinys $mokinys): string
     {
         $mokiniovardas = $mokinys->getMokinys();
         $mokinioaprasas = $mokinys->getMokinioAprasymas();
-        $stmt = $this->connect->prepare('INSERT INTO ' . $pavadinimas . ' (mokinys, mokinio_aprasymas) values (:mvardas, :maprasas);');
+        $mokinioklase = $mokinys->getKlasesId();
+        $stmt = $this->connect->prepare('INSERT INTO mokiniai (mokinys, mokinio_aprasymas, klases_id) values (:mvardas, :maprasas, :mklase);');
         $stmt->bindValue(':mvardas', $mokiniovardas);
         $stmt->bindValue(':maprasas', $mokinioaprasas);
+        $stmt->bindValue(':mklase', $mokinioklase);
         $stmt->execute();
+        return $this->connect->lastInsertId();
     }
 
     public function findAllKlases(): array
     {
-        $stmt = $this->connect->prepare('SELECT * FROM klases order by id');
+        $stmt = $this->connect->prepare('SELECT * FROM klases ORDER BY id');
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_CLASS, Klase::class);
         $rezultatai = $stmt->fetchAll();
         return $rezultatai;
     }
-//SET @last_id_in_table1 = LAST_INSERT_ID();
+
+    public function findAllMokiniai($searchId): array
+    {
+        $stmt = $this->connect->prepare('SELECT id, mokinys, mokinio_aprasymas, klases_id FROM mokiniai WHERE klases_id='.$searchId.' ORDER BY id');
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, Mokinys::class);
+        $rezultatai = $stmt->fetchAll();
+        return $rezultatai;
+    }
+
+    public function findMokiniById($searchId): array
+    {
+        $stmt = $this->connect->prepare('SELECT mokinys FROM mokiniai WHERE klases_id='.$searchId);
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, Mokinys::class);
+        $rezultatai = $stmt->fetchAll();
+        return $rezultatai;
+    }
     public function deleteKlaseById(int $id): void
     {
         $stmt = $this->connect->prepare('DELETE FROM klases WHERE id = ' . $id);
