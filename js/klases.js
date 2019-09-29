@@ -68,11 +68,12 @@ $('#trinti').click(function () {
     }
     visi_id = JSON.stringify(visi_id);
     $.post('index.php?action=trintiklases', visi_id);
+    $.post('index.php?action=trintimokiniusSuKlase', visi_id);
 });
 
 $('#prideti').click(function () {
     $('#appending').append('<div class="eilute "><div class="turinys turinioplotis"><input type="checkbox" name="checkclass" value="unnamed">' +
-        '<input type="text" name="newclass" id="addnewclass" size="29em"></div></div>');
+        '<input type="text" name="newclass" id="addnewclass" size="28em"></div></div>');
     $('#prideti').prop('disabled', true);
     $('#saugoti').prop('disabled', false);
 });

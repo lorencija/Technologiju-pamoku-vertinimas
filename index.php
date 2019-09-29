@@ -79,16 +79,12 @@ if ($action) {
         }
         echo json_encode($naujiMokiniai);
 
-    }elseif ($action == 'mokiniopasirinkimas') {
+    } elseif ($action == 'mokiniopasirinkimas') {
         $name = $_GET['name'];
+        $klase = $_GET['klase'];
         $templateEngineService = new TemplateEngineService(__DIR__ . '\mokinys.html');
-        $templateEngineService->setParameters(['klases_id' => $name]);
+        $templateEngineService->setParameters(['mokinio_id' => $name, 'klases_id' => $klase]);
         $templateEngineService->render();
-//        $name = $_GET['name'];
-//        $duomenuBaze = new Db();
-//        $pasirinktasmokinys = $duomenuBaze->findMokiniById($name);
-//        $duomenuBaze->close();
-//        echo '{"mokiniovardas":"' . $pasirinktasmokinys . '"}';
 
     } elseif ($action == 'mp_sarasas') {
         $name = $_GET['name'];
@@ -121,14 +117,75 @@ if ($action) {
         try {
             $name = $_GET['name'];
             if (empty($name)) {
-                throw new \Exception('Nenurodyta klasė');
+                throw new \Exception('Nenurodyta klasė!');
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteKlaseById((int)$name);
             $duomenuBaze->close();
             header('Location: index.html');
         } catch (\Exception $e) {
-            echo 'Klaida trinant klasę';
+            echo 'Klaida trinant klasę!';
+        }
+
+    } elseif ($action == 'trintimokinius') {
+        try {
+            $allID = json_decode(file_get_contents('php://input'));
+            if (empty($allID)) {
+                throw new \Exception('Nenurodytas mokinys!');
+            }
+            $duomenuBaze = new Db();
+            $duomenuBaze->deleteMokinius($allID);
+            $duomenuBaze->close();
+        } catch (\Exception $e) {
+            echo 'Klaida trinant mokinį!';
+        }
+
+    } elseif ($action == 'trintimokiniusSuKlase') {
+        try {
+            $allID = json_decode(file_get_contents('php://input'));
+            if (empty($allID)) {
+                throw new \Exception('Nenurodytas mokinys!');
+            }
+            $duomenuBaze = new Db();
+            $duomenuBaze->deleteMokiniusSuKlase($allID);
+            $duomenuBaze->close();
+        } catch (\Exception $e) {
+            echo 'Klaida trinant mokinį!';
+        }
+
+    } elseif ($action == 'trintimokini') {
+        try {
+            $name = $_GET['name'];
+            $klase = $_GET['klase'];
+            if (empty($name)) {
+                throw new \Exception('Nenurodytas mokinys!');
+            }
+            $duomenuBaze = new Db();
+            $duomenuBaze->deleteMokiniById((int)$name);
+            $duomenuBaze->close();
+            header('Location: index.php?action=mokiniu_sarasas&name=' . $klase);
+        } catch (\Exception $e) {
+            echo 'Klaida trinant mokinį!';
+        }
+
+    } elseif ($action == 'redaguotimokini') {
+        $name = $_GET['name'];//klase
+        $edditId = $_GET['id'];
+        $ivedimas = new Ivedimas();
+        $mok = new Mokinys();
+        $zinute = $ivedimas->tikrintiIvedima();
+        if ($zinute === 'OK') {
+            $A = $ivedimas->ivestiObjekta();
+            $mok->setMokinys($A['cname']);
+            $mok->setMokinioAprasymas($A['ctext']);
+            $mok->setKlasesId($name);
+            $mok->setId($edditId);
+            $duomenuBaze = new Db();
+            $duomenuBaze->edditMokinys($mok);
+            $duomenuBaze->close();
+            echo '{"id":"' . $edditId . '","zinute":"' . $zinute . '"}';
+        } else {
+            echo '{"id":"0","zinute":"' . $zinute . '"}';
         }
 
     } else {

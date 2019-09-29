@@ -63,8 +63,8 @@ body {
 }
 
 .turinioplotis {
-    width: 180px;
-    word-wrap: break-word;
+    width: 250px;
+    /*word-wrap: break-word;*/
 }
 
 .control {
@@ -232,7 +232,9 @@ a:hover {
     display: flex;
     justify-content: center;
 }
-
+span {
+    margin: 0 5px;
+}
 /* mobile styles, 270px breakpoint */
 /*@media only screen and (min-width: 16.875em) {*/
 
@@ -276,4 +278,5 @@ a:hover {
     .container {
         border-width: 5px;
     }
+
 }

@@ -55,7 +55,7 @@ class Db
 
     public function findAllMokiniai($searchId): array
     {
-        $stmt = $this->connect->prepare('SELECT id, mokinys, mokinio_aprasymas, klases_id FROM mokiniai WHERE klases_id='.$searchId.' ORDER BY id');
+        $stmt = $this->connect->prepare('SELECT id, mokinys, mokinio_aprasymas, klases_id FROM mokiniai WHERE klases_id=' . $searchId . ' ORDER BY id');
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_CLASS, Mokinys::class);
         $rezultatai = $stmt->fetchAll();
@@ -64,25 +64,76 @@ class Db
 
     public function findMokiniById($searchId): array
     {
-        $stmt = $this->connect->prepare('SELECT mokinys FROM mokiniai WHERE klases_id='.$searchId);
+        $stmt = $this->connect->prepare('SELECT mokinys FROM mokiniai WHERE klases_id=' . $searchId);
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_CLASS, Mokinys::class);
         $rezultatai = $stmt->fetchAll();
         return $rezultatai;
     }
+
     public function deleteKlaseById(int $id): void
     {
         $stmt = $this->connect->prepare('DELETE FROM klases WHERE id = ' . $id);
         $stmt->execute();
     }
 
-    public function deleteKlases(array $klases)
+    public function deleteMokiniById(int $id): void
+    {
+        $stmt = $this->connect->prepare('DELETE FROM mokiniai WHERE id = ' . $id);
+        $stmt->execute();
+    }
+    public function deleteMokiniByIdSuKlase(int $id): void
+    {
+        $stmt = $this->connect->prepare('DELETE FROM mokiniai WHERE klases_id = ' . $id );
+        $stmt->execute();
+    }
+    public function findKlase(int $id): array
+    {
+        $stmt = $this->connect->prepare('select klases_id FROM mokiniai WHERE id = ' . $id);
+        $stmt->execute();
+        $rezultatai = $stmt->fetchAll();
+        return $rezultatai;
+    }
+
+    public function deleteKlases(array $klases): void
     {
         foreach ($klases as $klase) {
             $this->deleteKlaseById((int)$klase->id);
         }
 
     }
+
+    public function deleteMokinius(array $mokiniai): void
+    {
+        foreach ($mokiniai as $mokinys) {
+            $this->deleteMokiniById((int)$mokinys->id);
+        }
+
+    }
+
+    public function deleteMokiniusSuKlase(array $mokiniai): void
+    {
+        foreach ($mokiniai as $mokinys) {
+            $this->deleteMokiniByIdSuKlase((int)$mokinys->id);
+        }
+
+    }
+
+    function edditMokinys(Mokinys $mokinys): void
+    {
+        $mokiniovardas = $mokinys->getMokinys();
+        $mokinioaprasas = $mokinys->getMokinioAprasymas();
+        $mokinioklase = $mokinys->getKlasesId();
+        $mokinioid = $mokinys->getId();
+        $sql = 'UPDATE mokiniai SET mokinys = :mvardas, mokinio_aprasymas = :maprasas WHERE klases_id = :mklase AND id = :mid;';
+        $stmt = $this->connect->prepare($sql);
+        $stmt->bindValue(':mvardas', $mokiniovardas);
+        $stmt->bindValue(':maprasas', $mokinioaprasas);
+        $stmt->bindValue(':mklase', $mokinioklase);
+        $stmt->bindValue(':mid', $mokinioid);
+        $stmt->execute();
+    }
+
     public function close(): void
     {
         $this->connect = null;
