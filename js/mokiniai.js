@@ -37,9 +37,9 @@ $(document).ready(function () {
         for (i = 0; i < as.length; i++) {
             let masyvas = as[i];
             $('#appending').append('<div class="eilute K' + masyvas['id'] + '"><div class="turinys turinioplotis"><input type="checkbox"  name="' + masyvas['id'] + '" id="' + masyvas['mokinio_aprasymas'] +
-                '" value="' + masyvas['mokinys'] + ' ">' + '<a href="index.php?action=mokiniopasirinkimas&name=' + masyvas['id'] + '&klase='+name_by_id+'" id="' + masyvas['id'] +
+                '" value="' + masyvas['mokinys'] + ' ">' + '<a href="index.php?action=mokiniopasirinkimas&klase=' + name_by_id +'&name=' + masyvas['id'] +  '" id="' + masyvas['id'] +
                 '">' + masyvas['mokinys'] + '</a></div><div class="turinys">' +
-               '<span class="trinimui"><a href="index.php?action=trintimokini&name='+ masyvas['id'] + '&klase='+name_by_id+'">Trinti</a></span></div></div>');
+                '<span class="trinimui"><a href="index.php?action=trintimokini&klase=' + name_by_id +'&name=' + masyvas['id'] +  '">Trinti</a></span></div></div>');
             $('#saugotimokini').prop('disabled', true);
             $('#trintimokini').prop('disabled', true);
             $('#redaguotimokini').prop('disabled', true);
@@ -78,7 +78,7 @@ $('#redaguotimokini').click(function () {
     $('#redaguotimokini').prop('disabled', true);
 });
 
-function isvestiSaugomaReiksme(data,select) {
+function isvestiSaugomaReiksme(data, select) {
     data = JSON.parse(data);
     if (c_name.length < 50) {
         if (data.zinute === 'OK') {
@@ -96,16 +96,17 @@ function isvestiSaugomaReiksme(data,select) {
         $('#addnewclass').val('');
     }
 }
+
 function setJson() {
     let name_by_id = $('#saugotimokini').attr('data-klase');
     let eddit_id = $('.redaguoti').attr('data-value');
     if (eddit_id > 0) {
         $.post('index.php?action=redaguotimokini&name=' + name_by_id + '&id=' + eddit_id, jsonData, function (data) {
-            isvestiSaugomaReiksme(data,'.redaguoti');
+            isvestiSaugomaReiksme(data, '.redaguoti');
         })
     } else {
         $.post('index.php?action=enteringmokiniai&name=' + name_by_id, jsonData, function (data) {
-            isvestiSaugomaReiksme(data,'.eilute:last-child');
+            isvestiSaugomaReiksme(data, '.eilute:last-child');
         })
     }
 
@@ -124,9 +125,7 @@ $('#saugotimokini').click(function () {
     setJson();
 });
 
-http://projektas/index.php?action=mp_sarasas&name=4
-
-    $('#atgal').click(function () {
-        let name_by_id = $('#atgal').attr('data-klase');
-           window.open('index.php?action=mp_sarasas&name=' + name_by_id, '_self');
-    });
+$('#atgal').click(function () {
+    let name_by_id = $('#atgal').attr('data-klase');
+    window.open('index.php?action=mp_sarasas&name=' + name_by_id, '_self');
+});

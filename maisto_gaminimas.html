@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title> Technologiju PVS </title>
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="shortcut icon" href="images/favicon.ico">
+</head>
+<body>
+
+<div id="dialogoverlay"></div>
+<div id="dialogbox">
+    <div>
+        <div id="dialoghead"></div>
+        <div id="dialogbody"></div>
+        <div id="dialogfoot"></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="control-main">
+        <div class="antraste"><h1>Maisto gaminimas</h1></div>
+        <div class="klases">
+            <form id="klases">
+                <div id="appending"></div>
+            </form>
+        </div>
+        <div class="control">
+            <div class="controlelent">
+                <button id="pridetipamoka" class="mygtukas1" data-klase="{{klases_id}}">Pridėti</button>
+            </div>
+            <div class="controlelent">
+                <button id="saugotipamoka" class="mygtukas1" data-klase="{{klases_id}}">Saugoti</button>
+            </div>
+            <div class="controlelent">
+                <button id="redaguotipamoka" class="mygtukas1" data-klase="{{klases_id}}">Redaguoti</button>
+            </div>
+            <div class="controlelent">
+                <button id="trintipamoka" class="mygtukas1" data-klase="{{klases_id}}">Trinti</button>
+            </div>
+            <div class="controlelent">
+                <button id="atgal" class="mygtukas1" data-klase="{{klases_id}}">Atgal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="js/ivedimas.js"></script>
+<script src="js/maisto_gaminimas.js"></script>
+<script src="js/alert.js"></script>
+</body>
+</html>
