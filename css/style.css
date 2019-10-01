@@ -298,13 +298,17 @@ span {
     cursor: pointer;
     color: white;
     background-color: #00948E;
+    border: solid #005B59 2px;
+    border-radius: 20px;
+
 }
 .containerTab {
     display: none;
     background-color: #C2E5DB;
     padding: 20px;
     color: white;
-  }
+    border-radius: 20px;
+     }
 .containerElement{
     grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
     grid-auto-rows: 94px;
@@ -318,35 +322,44 @@ span {
 .myselect {
     display:inline-block;
     overflow: hidden;
-    border:solid black 1px;
+    border:solid #005B59 1px;
+    border-radius: 10px;
+    margin: 10px ;
 }
 
 .elem{
     display:inline-block;
     margin: 15px 3px;
     text-align: center;
+    font-weight: bold;
 }
+
 .myselect > select {
+
     padding: 10px ;
     margin:-5px -20px -5px -5px;";
     display: flex;
     align-self:center;
 }
 .myselect > select > option:hover {
-    box-shadow: 0 0 10px 100px red inset;
-    color: green;
+    box-shadow: 0 0 10px 100px #C2E5DB inset;
+    color: #00948E;
 }
 .myselect > select >option:checked {
-    box-shadow: 0 0 10px 100px blue inset;
+    box-shadow: 0 0 10px 100px #C2E5DB inset;
 }
 .myselect > select > option{
     width:40px;
     padding:10px;
-    background-color: green;
+    background-color: #00948E;
     color:white;
 }
 .headerselection{
     display: flex;
     justify-content: center;
-    margin: 10px;
+    font-size: 1.2em;
+    /*margin: 10px;*/
+    padding: 10px;
+    background-color: #00948E;
+    /*border-radius: 10px;*/
 }

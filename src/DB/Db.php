@@ -5,6 +5,7 @@ namespace PROJ\DB;
 use PROJ\Entity\Pamoka;
 use PROJ\Entity\Klase;
 use PROJ\Entity\Mokinys;
+use PROJ\Entity\Vertinimas;
 
 class Db
 {
@@ -56,6 +57,30 @@ class Db
         return $this->connect->lastInsertId();
     }
 
+    function saveToVertinimas(Vertinimas $vertinimas): void
+    {
+        $pamoka = $vertinimas->getPamokosId();
+        $klase = $vertinimas->getKlasesId();
+        $mokinys= $vertinimas->getMokinioId();
+        $p1 = $vertinimas->getP1();
+        $p2 = $vertinimas->getP2();
+        $p3 = $vertinimas->getP3();
+        $p4 = $vertinimas->getP4();
+        $p5 = $vertinimas->getP5();
+        $p6 = $vertinimas->getP6();
+        $stmt = $this->connect->prepare('INSERT INTO vertinimas (klases_id, pamokos_id, mokinio_id, p1, p2, p3, p4, p5, p6) values (:k, :p, :m, :p1, :p2, :p3, :p4, :p5, :p6);');
+        $stmt->bindValue(':p', $pamoka);
+        $stmt->bindValue(':k', $klase);
+        $stmt->bindValue(':m', $mokinys);
+        $stmt->bindValue(':p1', $p1);
+        $stmt->bindValue(':p2', $p2);
+        $stmt->bindValue(':p3', $p3);
+        $stmt->bindValue(':p4', $p4);
+        $stmt->bindValue(':p5', $p5);
+        $stmt->bindValue(':p6', $p6);
+        $stmt->execute();
+    }
+
     public function findAllKlases(): array
     {
         $stmt = $this->connect->prepare('SELECT * FROM klases ORDER BY id');
@@ -73,6 +98,8 @@ class Db
         $rezultatai = $stmt->fetchAll();
         return $rezultatai;
     }
+
+
     public function findAllGaminimoPamokos($searchId): array
     {
         $stmt = $this->connect->prepare('SELECT id, pamoka, klases_id FROM maisto_pamokos WHERE klases_id=' . $searchId . ' ORDER BY id');
@@ -82,11 +109,10 @@ class Db
         return $rezultatai;
     }
 
-    public function findMokiniById($searchId): array
+    public function findMokiaiByKlase($searchId): array
     {
-        $stmt = $this->connect->prepare('SELECT mokinys FROM mokiniai WHERE klases_id=' . $searchId);
+        $stmt = $this->connect->prepare('SELECT id, mokinys FROM mokiniai WHERE klases_id=' . $searchId.' ORDER BY id;');
         $stmt->execute();
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, Mokinys::class);
         $rezultatai = $stmt->fetchAll();
         return $rezultatai;
     }
@@ -101,20 +127,6 @@ class Db
     {
         $stmt = $this->connect->prepare('DELETE FROM mokiniai WHERE id = ' . $id);
         $stmt->execute();
-    }
-
-    public function deleteMokiniByIdSuKlase(int $id): void
-    {
-        $stmt = $this->connect->prepare('DELETE FROM mokiniai WHERE klases_id = ' . $id);
-        $stmt->execute();
-    }
-
-    public function findKlase(int $id): array
-    {
-        $stmt = $this->connect->prepare('select klases_id FROM mokiniai WHERE id = ' . $id);
-        $stmt->execute();
-        $rezultatai = $stmt->fetchAll();
-        return $rezultatai;
     }
 
     public function deleteKlases(array $klases): void
@@ -132,6 +144,7 @@ class Db
         }
 
     }
+
     public function deleteMaistoPamokaById(int $id): void
     {
         $stmt = $this->connect->prepare('DELETE FROM maisto_pamokos WHERE id = ' . $id);
@@ -145,6 +158,7 @@ class Db
         }
 
     }
+
     public function deleteMokiniusSuKlase(array $mokiniai): void
     {
         foreach ($mokiniai as $mokinys) {
@@ -152,6 +166,13 @@ class Db
         }
 
     }
+
+    public function deleteMokiniByIdSuKlase(int $id): void
+    {
+        $stmt = $this->connect->prepare('DELETE FROM mokiniai WHERE klases_id = ' . $id);
+        $stmt->execute();
+    }
+
     public function deleteMaistoPamokasSuKlase(array $mokiniai): void
     {
         foreach ($mokiniai as $mokinys) {
@@ -159,6 +180,7 @@ class Db
         }
 
     }
+
     public function deleteMaistiPmakonkasByIdSuKlase(int $id): void
     {
         $stmt = $this->connect->prepare('DELETE FROM maisto_pamokos WHERE klases_id = ' . $id);
@@ -191,6 +213,13 @@ class Db
         $stmt->bindValue(':pklase', $pamokosklase);
         $stmt->bindValue(':pid', $pamokosid);
         $stmt->execute();
+    }
+    public function findVertinimai($klasesId, $pamokosId, $mokinysId): array
+    {
+        $stmt = $this->connect->prepare('SELECT p1, p2, p3, p4, p5, p6 FROM vertinimas WHERE klases_id=' . $klasesId. ' AND mokinio_id='.$mokinysId.' AND pamokos_id='.$pamokosId.';');
+        $stmt->execute();
+        $rezultatai = $stmt->fetchAll();
+        return $rezultatai;
     }
 
     public function close(): void

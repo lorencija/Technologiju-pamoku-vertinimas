@@ -68,8 +68,8 @@ $('#trinti').click(function () {
     }
     visi_id = JSON.stringify(visi_id);
     $.post('index.php?action=trintiklases', visi_id);
-    $.post('index.php?action=trintimokiniusSuKlase', visi_id);
-    $.post('index.php?action=trintiMaistopamokasSuKlase', visi_id);
+    // $.post('index.php?action=trintimokiniusSuKlase', visi_id);
+    // $.post('index.php?action=trintiMaistopamokasSuKlase', visi_id);
 });
 
 $('#prideti').click(function () {

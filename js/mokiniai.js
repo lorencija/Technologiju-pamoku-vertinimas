@@ -4,31 +4,31 @@ window.addEventListener("click", event => {
 
 function zymetiTintiMygtuka() {
     data = $('#klases').serializeArray();
-    console.log(data);
-    if (data.length > 0) {
-        let reiksme = data[0];
-        $('#trintimokini').prop('disabled', false);
-        $('#pridetimokini').prop('disabled', true);
-        $('#redaguotimokini').prop('disabled', true);
-        if (reiksme['name'] === 'newclass') {
-            $('#trintimokini').prop('disabled', true);
+         if (data.length > 0) {
+            let reiksme = data[0];
+            $('#trintimokini').prop('disabled', false);
             $('#pridetimokini').prop('disabled', true);
-        }
-        if (data.length === 1) {
+            $('#redaguotimokini').prop('disabled', true);
             if (reiksme['name'] === 'newclass') {
-                $('#redaguotimokini').prop('disabled', true);
-            } else {
-                $('#redaguotimokini').prop('disabled', false);
+                $('#trintimokini').prop('disabled', true);
+                $('#pridetimokini').prop('disabled', true);
             }
+            if (data.length === 1) {
+                if (reiksme['name'] === 'newclass') {
+                    $('#redaguotimokini').prop('disabled', true);
+                } else {
+                    $('#redaguotimokini').prop('disabled', false);
+                }
+            }
+        } else {
+            $('#trintimokini').prop('disabled', true);
+            $('#pridetimokini').prop('disabled', false);
+            $('#redaguotimokini').prop('disabled', true);
         }
-    } else {
-        $('#trintimokini').prop('disabled', true);
-        $('#pridetimokini').prop('disabled', false);
-        $('#redaguotimokini').prop('disabled', true);
-    }
 }
 
 $(document).ready(function () {
+
     let name_by_id = $('#saugotimokini').attr('data-klase');
     $.get('index.php?action=visimokiniai&name=' + name_by_id, function (data) {
 
@@ -37,8 +37,8 @@ $(document).ready(function () {
         for (i = 0; i < as.length; i++) {
             let masyvas = as[i];
             $('#appending').append('<div class="eilute K' + masyvas['id'] + '"><div class="turinys turinioplotis"><input type="checkbox"  name="' + masyvas['id'] + '" id="' + masyvas['mokinio_aprasymas'] +
-                '" value="' + masyvas['mokinys'] + ' ">' + '<a href="index.php?action=mokiniopasirinkimas&klase=' + name_by_id +'&name=' + masyvas['id'] +  '" id="' + masyvas['id'] +
-                '">' + masyvas['mokinys'] + '</a></div><div class="turinys">' +
+                '" value="' + masyvas['mokinys'] + ' ">' + '<a href="#">' +
+                masyvas['mokinys'] + '</a></div><div class="turinys">' +
                 '<span class="trinimui"><a href="index.php?action=trintimokini&klase=' + name_by_id +'&name=' + masyvas['id'] +  '">Trinti</a></span></div></div>');
             $('#saugotimokini').prop('disabled', true);
             $('#trintimokini').prop('disabled', true);
@@ -46,10 +46,7 @@ $(document).ready(function () {
         }
     });
 });
-// '<span class="trinimui"><a href="index.php?action=redaguotimokini1&name=' +name_by_id+'&id'+ masyvas['id'] +
-// '&value'+ masyvas['mokinys'] +'&value1'+ masyvas['mokinio_aprasymas'] +'">Redaguoti</a></span>'+
-// '<span class="trinimui"><a href="index.php?action=redaguotimokini&name=' +name_by_id+'&id'+ masyvas['id'] + '">Redaguoti</a></span>'
-
+// href="index.php?action=mokiniopasirinkimas&klase=' + name_by_id +'&name=' + masyvas['id'] +  '" id="' + masyvas['id'] +'"
 $('#trintimokini').click(function () {
     let data;
     data = $('#klases').serializeArray();

@@ -11,6 +11,8 @@ use PROJ\DTO\KlaseDTO;
 use PROJ\DTO\MokinioDTO;
 use PROJ\DTO\PamokosDTO;
 use PROJ\Service\TemplateEngineService;
+use PROJ\Entity\Vertinimas;
+use PROJ\Manager\IvedimasVertinimo;
 
 $action = $_REQUEST['action'];
 if ($action) {
@@ -98,7 +100,7 @@ if ($action) {
         }
         echo json_encode($naujiMokiniai);
 
-    }elseif ($action == 'visosgaminimopamokos') {
+    } elseif ($action == 'visosgaminimopamokos') {
         $name = $_GET['name'];
         $duomenuBaze = new Db();
         $pamokuMasyvas = $duomenuBaze->findAllGaminimoPamokos($name);
@@ -112,7 +114,7 @@ if ($action) {
             $naujaPamoka->klases_id = $pam->getKlasesId();
             $naujosPamokos[] = $naujaPamoka;
         }
-             echo json_encode($naujosPamokos);
+        echo json_encode($naujosPamokos);
 
     } elseif ($action == 'mokiniopasirinkimas') {
         $name = $_GET['name'];
@@ -151,8 +153,7 @@ if ($action) {
         $templateEngineService = new TemplateEngineService(__DIR__ . '\maistogaminimo_vertinimas.html');
         $templateEngineService->setParameters(['pamokos_id' => $pamoka, 'klases_id' => $name]);
         $templateEngineService->render();
-       }
-    elseif ($action == 'trintiklases') {
+    } elseif ($action == 'trintiklases') {
         try {
             $allID = json_decode(file_get_contents('php://input'));
             if (empty($allID)) {
@@ -160,6 +161,8 @@ if ($action) {
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteKlases($allID);
+            $duomenuBaze->deleteMokiniusSuKlase($allID);
+            $duomenuBaze->deleteMaistoPamokasSuKlase($allID);
             $duomenuBaze->close();
         } catch (\Exception $e) {
             echo 'Klaida trinant klasę';
@@ -173,6 +176,8 @@ if ($action) {
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteKlaseById((int)$name);
+            $duomenuBaze->deleteMokiniByIdSuKlase((int)$name);
+            $duomenuBaze->deleteMaistiPmakonkasByIdSuKlase((int)$name);
             $duomenuBaze->close();
             header('Location: index.html');
         } catch (\Exception $e) {
@@ -187,19 +192,6 @@ if ($action) {
             }
             $duomenuBaze = new Db();
             $duomenuBaze->deleteMokinius($allID);
-            $duomenuBaze->close();
-        } catch (\Exception $e) {
-            echo 'Klaida trinant mokinį!';
-        }
-
-    } elseif ($action == 'trintimokiniusSuKlase') {
-        try {
-            $allID = json_decode(file_get_contents('php://input'));
-            if (empty($allID)) {
-                throw new \Exception('Nenurodytas mokinys!');
-            }
-            $duomenuBaze = new Db();
-            $duomenuBaze->deleteMokiniusSuKlase($allID);
             $duomenuBaze->close();
         } catch (\Exception $e) {
             echo 'Klaida trinant mokinį!';
@@ -220,23 +212,22 @@ if ($action) {
             echo 'Klaida trinant mokinį!';
         }
 
-    }
-     elseif ($action == 'trintiMaistoPamoka') {
-         try {
-             $name = $_GET['name'];
-             $pamoka = $_GET['pamoka'];
-             if (empty($name)) {
-                 throw new \Exception('Nenurodyta pamoka!');
-             }
-             $duomenuBaze = new Db();
-             $duomenuBaze->deleteMaistoPamokaById((int)$name);
-             $duomenuBaze->close();
-             header('Location: index.php?action=maisto_gaminimas&name=' . $pamoka);
-         } catch (\Exception $e) {
-             echo 'Klaida trinant pamoką!';
-         }
+    } elseif ($action == 'trintiMaistoPamoka') {
+        try {
+            $name = $_GET['name'];
+            $pamoka = $_GET['pamoka'];
+            if (empty($name)) {
+                throw new \Exception('Nenurodyta pamoka!');
+            }
+            $duomenuBaze = new Db();
+            $duomenuBaze->deleteMaistoPamokaById((int)$name);
+            $duomenuBaze->close();
+            header('Location: index.php?action=maisto_gaminimas&name=' . $pamoka);
+        } catch (\Exception $e) {
+            echo 'Klaida trinant pamoką!';
+        }
 
-     }  elseif ($action == 'trintiMaistoPamokas') {
+    } elseif ($action == 'trintiMaistoPamokas') {
         try {
             $allID = json_decode(file_get_contents('php://input'));
             if (empty($allID)) {
@@ -250,20 +241,7 @@ if ($action) {
             echo 'Klaida trinant pamoką!';
         }
 
-    } elseif ($action == 'trintiMaistopamokasSuKlase') {
-        try {
-            $allID = json_decode(file_get_contents('php://input'));
-            if (empty($allID)) {
-                throw new \Exception('Nenurodytas mokinys!');
-            }
-            $duomenuBaze = new Db();
-            $duomenuBaze->deleteMaistoPamokasSuKlase($allID);
-            $duomenuBaze->close();
-        } catch (\Exception $e) {
-            echo 'Klaida trinant mokinį!';
-        }
-
-    }elseif ($action == 'redaguotimokini') {
+    } elseif ($action == 'redaguotimokini') {
         $name = $_GET['name'];//klase
         $edditId = $_GET['id'];
         $ivedimas = new Ivedimas();
@@ -301,6 +279,48 @@ if ($action) {
         } else {
             echo '{"id":"0","zinute":"' . $zinute . '"}';
         }
+
+    } elseif ($action == 'gautimokinius') {
+        $klases_id = $_GET['klase'];
+        $duomenuBaze = new Db();
+        $mokiniai = $duomenuBaze->findMokiaiByKlase($klases_id);
+        $duomenuBaze->close();
+        echo json_encode($mokiniai);
+
+    } elseif ($action == 'saugotipamokosvertinima') {
+        $pamoka = $_GET['pamoka'];
+        $klase = $_GET['klase'];
+        $mokinys = $_GET['mokinys'];
+        $ivedimas = new IvedimasVertinimo();
+        $vertinimas = new Vertinimas();
+//        $zinute = $ivedimas->tikrintiIvedimaVertinimo();
+//        if ($zinute === 'OK') {
+        $A = $ivedimas->ivestiObjektaVertinimo();
+        $vertinimas->setP1($A['p1']);
+        $vertinimas->setP2($A['p2']);
+        $vertinimas->setP3($A['p3']);
+        $vertinimas->setP4($A['p4']);
+        $vertinimas->setP5($A['p5']);
+        $vertinimas->setP6($A['p6']);
+        $vertinimas->setPamokosId($pamoka);
+        $vertinimas->setKlasesId($klase);
+        $vertinimas->setMokinioId($mokinys);
+        $duomenuBaze = new Db();
+        $duomenuBaze->saveToVertinimas($vertinimas);
+        $duomenuBaze->close();
+//            echo '{"id":"1","zinute":"' . $zinute . '"}';
+//        } else {
+//            echo '{"id":"0","zinute":"' . $zinute . '"}';
+//        }
+
+    } elseif ($action == 'gautivertinimus') {
+        $pamoka = $_GET['pamoka'];
+        $klase = $_GET['klase'];
+        $mokinys = $_GET['mokinys'];
+        $duomenuBaze = new Db();
+        $vertinimai= $duomenuBaze->findVertinimai($klase, $pamoka, $mokinys);
+        $duomenuBaze->close();
+        echo json_encode($vertinimai);
 
     } else {
         echo 'klaida action';
